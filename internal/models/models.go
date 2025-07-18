@@ -23,26 +23,72 @@ type ContractRegistry struct {
 	Metadata     *VehicleMetadata `gorm:"foreignKey:MetadataHash;references:Hash" json:"metadata,omitempty"`
 }
 
-// VehicleData representa a estrutura dos dados do veículo
+// VehicleData representa a estrutura dos dados do contrato de financiamento
 type VehicleData struct {
-	Make           string         `json:"make"`
-	Model          string         `json:"model"`
-	Year           int            `json:"year"`
-	VIN            string         `json:"vin"`
-	Color          string         `json:"color"`
-	Engine         string         `json:"engine"`
-	Transmission   string         `json:"transmission"`
-	Mileage        int            `json:"mileage"`
-	Price          float64        `json:"price"`
-	FinancingTerms FinancingTerms `json:"financingTerms"`
-}
-
-// FinancingTerms representa os termos de financiamento
-type FinancingTerms struct {
-	DownPayment  float64 `json:"downPayment"`
-	LoanAmount   float64 `json:"loanAmount"`
-	InterestRate float64 `json:"interestRate"`
-	TermMonths   int     `json:"termMonths"`
+	RegConId                              string `json:"regConId"`
+	NumeroContrato                        string `json:"numeroContrato"`
+	DataContrato                          string `json:"dataContrato"`
+	CnpjAgenteFinanceiro                  string `json:"cnpjAgenteFinanceiro"`
+	NomeAgenteFinanceiro                  string `json:"nomeAgenteFinanceiro"`
+	EnderecoAgenteFinanceiro              string `json:"enderecoAgenteFinanceiro"`
+	NumeroEnderecoAgenteFinanceiro        string `json:"numeroEnderecoAgenteFinanceiro"`
+	ComplementoEnderecoAgenteFinanceiro   string `json:"complementoEnderecoAgenteFinanceiro"`
+	BairroEnderecoAgenteFinanceiro        string `json:"bairroEnderecoAgenteFinanceiro"`
+	NomeMunicipioEnderecoAgenteFinanceiro string `json:"nomeMunicipioEnderecoAgenteFinanceiro"`
+	UfEnderecoAgenteFinanceiro            string `json:"ufEnderecoAgenteFinanceiro"`
+	CepEnderecoAgenteFinanceiro           string `json:"cepEnderecoAgenteFinanceiro"`
+	TelefoneAgenteFinanceiro              string `json:"telefoneAgenteFinanceiro"`
+	EmailAgenteFinanceiro                 string `json:"emailAgenteFinanceiro"`
+	CpfCnpjProprietario                   string `json:"cpfCnpjProprietario"`
+	NomeProprietario                      string `json:"nomeProprietario"`
+	EnderecoProprietario                  string `json:"enderecoProprietario"`
+	NumeroEnderecoProprietario            string `json:"numeroEnderecoProprietario"`
+	BairroEnderecoProprietario            string `json:"bairroEnderecoProprietario"`
+	NomeMunicipioProprietario             string `json:"nomeMunicipioProprietario"`
+	UfEnderecoProprietario                string `json:"ufEnderecoProprietario"`
+	CepEnderecoProprietario               string `json:"cepEnderecoProprietario"`
+	TelefoneProprietario                  string `json:"telefoneProprietario"`
+	EmailProprietario                     string `json:"emailProprietario"`
+	VeiculoZeroKm                         bool   `json:"veiculoZeroKm"`
+	ChassiVeiculo                         string `json:"chassiVeiculo"`
+	ChassiRemarcadoVeiculo                string `json:"chassiRemarcadoVeiculo"`
+	PlacaVeiculo                          string `json:"placaVeiculo"`
+	TipoPlacaVeiculo                      string `json:"tipoPlacaVeiculo"`
+	UfPlacaVeiculo                        string `json:"ufPlacaVeiculo"`
+	RenavamVeiculo                        string `json:"renavamVeiculo"`
+	AnoFabricacaoVeiculo                  string `json:"anoFabricacaoVeiculo"`
+	AnoModeloVeiculo                      string `json:"anoModeloVeiculo"`
+	NumeroRestricaoVeiculo                string `json:"numeroRestricaoVeiculo"`
+	EspecieVeiculo                        string `json:"especieVeiculo"`
+	MarcaVeiculo                          string `json:"marcaVeiculo"`
+	ModeloVeiculo                         string `json:"modeloVeiculo"`
+	TipoRestricacaoContrato               string `json:"tipoRestricacaoContrato"`
+	UfRegistroContrato                    string `json:"ufRegistroContrato"`
+	CnpjResponsavelPeloRegistro           string `json:"cnpjResponsavelPeloRegistro"`
+	ValorTotalContrato                    string `json:"valorTotalContrato"`
+	ValorParcelaContrato                  string `json:"valorParcelaContrato"`
+	QuantidadeParcelasContrato            string `json:"quantidadeParcelasContrato"`
+	TaxaJurosMesContrato                  string `json:"taxaJurosMesContrato"`
+	TaxaJurosMesAnoContrato               string `json:"taxaJurosMesAnoContrato"`
+	PossuiJurosMultaContrato              string `json:"possuiJurosMultaContrato"`
+	TaxaJurosMultaContrato                string `json:"taxaJurosMultaContrato"`
+	PossuiJurosMoraDiaContrato            string `json:"possuiJurosMoraDiaContrato"`
+	TaxaJurosMoraDiaContrato              string `json:"taxaJurosMoraDiaContrato"`
+	ValorCustoRegistroContrato            string `json:"valorCustoRegistroContrato"`
+	ValorIofContrato                      string `json:"valorIofContrato"`
+	DataVencimentoPrimeiraParcelaContrato string `json:"dataVencimentoPrimeiraParcelaContrato"`
+	DataVencimentoUltimaParcelaContrato   string `json:"dataVencimentoUltimaParcelaContrato"`
+	DataLiberacaoCreditoContrato          string `json:"dataLiberacaoCreditoContrato"`
+	CidadeLiberacaoCreditoContrato        string `json:"cidadeLiberacaoCreditoContrato"`
+	UfLiberacaoCreditoContrato            string `json:"ufLiberacaoCreditoContrato"`
+	IndiceCorrecaoContrato                string `json:"indiceCorrecaoContrato"`
+	NumeroGrupoConsorcioContrato          string `json:"numeroGrupoConsorcioContrato"`
+	NumeroCotaConsorcioContrato           string `json:"numeroCotaConsorcioContrato"`
+	IndicativoPenalidadeContrato          string `json:"indicativoPenalidadeContrato"`
+	PenalidadeContrato                    string `json:"penalidadeContrato"`
+	IndicativoComissaoContrato            string `json:"indicativoComissaoContrato"`
+	ComissaoContrato                      string `json:"comissaoContrato"`
+	CategoriaVeiculo                      string `json:"categoriaVeiculo"`
 }
 
 // ContractRecord representa os dados on-chain do contrato
@@ -63,4 +109,21 @@ type CompleteContractData struct {
 		OnChain  ContractRecord `json:"onChain"`
 		OffChain VehicleData    `json:"offChain"`
 	} `json:"data"`
+}
+
+// ContractRegistrationRequest representa a requisição para registrar um contrato
+type ContractRegistrationRequest struct {
+	RegConId       string      `json:"regConId" binding:"required"`
+	NumeroContrato string      `json:"numeroContrato" binding:"required"`
+	DataContrato   string      `json:"dataContrato" binding:"required"`
+	VehicleData    VehicleData `json:"vehicleData" binding:"required"`
+}
+
+// ContractRegistrationResponse representa a resposta do registro de contrato
+type ContractRegistrationResponse struct {
+	Success      bool   `json:"success"`
+	Message      string `json:"message"`
+	RegConId     string `json:"regConId"`
+	MetadataHash string `json:"metadataHash"`
+	TxHash       string `json:"txHash"`
 }

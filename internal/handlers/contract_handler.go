@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"vfinance-api/internal/models"
 	"vfinance-api/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -81,4 +82,32 @@ func (h *ContractHandler) GetStats(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": stats})
+}
+
+func (h *ContractHandler) RegisterContract(c *gin.Context) {
+	var request models.ContractRegistrationRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validar campos obrigatórios
+	if request.RegConId == "" || request.NumeroContrato == "" || request.DataContrato == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "regConId, numeroContrato e dataContrato são obrigatórios"})
+		return
+	}
+
+	// Registrar contrato
+	response, err := h.contractService.RegisterContract(
+		request.RegConId,
+		request.NumeroContrato,
+		request.DataContrato,
+		request.VehicleData,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, response)
 }

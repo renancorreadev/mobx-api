@@ -1,0 +1,24 @@
+# Debug stage with Delve
+FROM golang:1.21-alpine AS debug
+
+WORKDIR /app
+
+# Install git and delve debugger
+RUN apk add --no-cache git && \
+    go install github.com/go-delve/delve/cmd/dlv@latest
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the application with debug symbols
+RUN CGO_ENABLED=0 GOOS=linux go build -gcflags="all=-N -l" -o main cmd/main.go
+
+# Expose port for the application and debugger
+EXPOSE 3000 2345
+
+# Run the application with delve debugger
+CMD ["dlv", "--listen=:2345", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "./main"] 

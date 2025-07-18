@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: vfinance-postgres
+    container_name: vfinance-postgres-debug
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: vfinance-redis
+    container_name: vfinance-redis-debug
     ports:
       - "6379:6379"
     healthcheck:
@@ -29,11 +29,14 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
-    build: .
-    container_name: vfinance-api
+  api-debug:
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    container_name: vfinance-api-debug
     ports:
       - "3001:3000"
+      - "2345:2345"  # Porta do debugger Delve
     environment:
       - API_PORT=3000
       - API_HOST=0.0.0.0
@@ -51,6 +54,10 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    security_opt:
+      - "seccomp:unconfined"  # Necessário para o debugger funcionar
+    cap_add:
+      - SYS_PTRACE  # Permissão para debugging
 
 volumes:
-  postgres_data:
+  postgres_data: 

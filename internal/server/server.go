@@ -41,6 +41,7 @@ func (s *Server) setupRoutes() error {
 	contractService := services.NewContractService(s.db, blockchainClient, metadataService)
 
 	// Inicializar handlers
+	authHandler := handlers.NewAuthHandler(s.config.JWTSecret)
 	metadataHandler := handlers.NewMetadataHandler(metadataService)
 	contractHandler := handlers.NewContractHandler(contractService)
 
@@ -51,6 +52,13 @@ func (s *Server) setupRoutes() error {
 	// Rotas da API
 	api := s.router.Group("/api")
 	{
+		// Rotas de autenticação
+		auth := api.Group("/auth")
+		{
+			auth.POST("/token", authHandler.GenerateToken)
+			auth.GET("/validate", authHandler.ValidateToken)
+		}
+
 		// Rotas de metadados
 		metadata := api.Group("/metadata")
 		{
@@ -63,6 +71,7 @@ func (s *Server) setupRoutes() error {
 		// Rotas de contratos
 		contracts := api.Group("/contracts")
 		{
+			contracts.POST("/", middleware.JWTAuth(s.config.JWTSecret), contractHandler.RegisterContract)
 			contracts.GET("/:regConId", contractHandler.GetContract)
 			contracts.GET("/active", contractHandler.GetActiveContracts)
 			contracts.GET("/hash/:hash", contractHandler.GetContractByHash)

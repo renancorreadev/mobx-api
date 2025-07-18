@@ -83,6 +83,96 @@ const contractABI = `[
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
+		],
+		"name": "getContractByHash",
+		"outputs": [
+			{
+				"components": [
+					{"internalType": "string", "name": "regConId", "type": "string"},
+					{"internalType": "string", "name": "numeroContrato", "type": "string"},
+					{"internalType": "string", "name": "dataContrato", "type": "string"},
+					{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"},
+					{"internalType": "uint256", "name": "timestamp", "type": "uint256"},
+					{"internalType": "address", "name": "registeredBy", "type": "address"},
+					{"internalType": "bool", "name": "active", "type": "bool"}
+				],
+				"internalType": "struct VFinanceRegistry.ContractRecord",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "string", "name": "regConId", "type": "string"}
+		],
+		"name": "getHashByRegConId",
+		"outputs": [
+			{"internalType": "bytes32", "name": "", "type": "bytes32"}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "string", "name": "regConId", "type": "string"}
+		],
+		"name": "doesContractExist",
+		"outputs": [
+			{"internalType": "bool", "name": "", "type": "bool"}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
+		],
+		"name": "doesHashExist",
+		"outputs": [
+			{"internalType": "bool", "name": "", "type": "bool"}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "uint256", "name": "index", "type": "uint256"}
+		],
+		"name": "getContractIdByIndex",
+		"outputs": [
+			{"internalType": "string", "name": "", "type": "string"}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
+		],
+		"name": "tokenURI",
+		"outputs": [
+			{"internalType": "string", "name": "", "type": "string"}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "string", "name": "regConId", "type": "string"}
+		],
+		"name": "getMetadataUrl",
+		"outputs": [
+			{"internalType": "string", "name": "", "type": "string"}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]`
 
@@ -156,16 +246,16 @@ func (c *Client) GetContract(regConId string) (*models.ContractRecord, error) {
 	return contractRecord, nil
 }
 
-func (c *Client) RegisterContract(regConId, numeroContrato, dataContrato string) (string, error) {
+func (c *Client) RegisterContract(regConId, numeroContrato, dataContrato string) (string, string, error) {
 	auth, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(1337))
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// Preparar dados para transação
 	data, err := c.contractABI.Pack("registerContract", regConId, numeroContrato, dataContrato)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// Estimar gas
@@ -174,7 +264,7 @@ func (c *Client) RegisterContract(regConId, numeroContrato, dataContrato string)
 		Data: data,
 	})
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	auth.GasLimit = gasLimit
@@ -192,16 +282,75 @@ func (c *Client) RegisterContract(regConId, numeroContrato, dataContrato string)
 	// Assinar transação
 	signedTx, err := auth.Signer(auth.From, tx)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// Enviar transação
 	err = c.ethClient.SendTransaction(context.Background(), signedTx)
 	if err != nil {
+		return "", "", err
+	}
+
+	// Aguardar confirmação da transação
+	receipt, err := bind.WaitMined(context.Background(), c.ethClient, signedTx)
+	if err != nil {
+		return signedTx.Hash().Hex(), "", err
+	}
+
+	// Decodificar logs para obter o hash gerado
+	if len(receipt.Logs) > 0 {
+		for _, log := range receipt.Logs {
+			if log.Topics[0] == c.contractABI.Events["ContractRegistered"].ID {
+				// Decodificar o evento para obter o metadataHash
+				var event struct {
+					RegConId       string
+					NumeroContrato string
+					MetadataHash   [32]byte
+					RegisteredBy   common.Address
+					Timestamp      *big.Int
+				}
+
+				err = c.contractABI.UnpackIntoInterface(&event, "ContractRegistered", log.Data)
+				if err == nil {
+					return signedTx.Hash().Hex(), hex.EncodeToString(event.MetadataHash[:]), nil
+				}
+			}
+		}
+	}
+
+	// Se não conseguir decodificar o evento, buscar o hash diretamente
+	metadataHash, err := c.GetHashByRegConId(regConId)
+	if err != nil {
+		return signedTx.Hash().Hex(), "", err
+	}
+
+	return signedTx.Hash().Hex(), metadataHash, nil
+}
+
+func (c *Client) GetHashByRegConId(regConId string) (string, error) {
+	// Preparar dados para chamada
+	data, err := c.contractABI.Pack("getHashByRegConId", regConId)
+	if err != nil {
 		return "", err
 	}
 
-	return signedTx.Hash().Hex(), nil
+	// Fazer chamada ao contrato
+	result, err := c.ethClient.CallContract(context.Background(), ethereum.CallMsg{
+		To:   &c.contractAddress,
+		Data: data,
+	}, nil)
+	if err != nil {
+		return "", err
+	}
+
+	// Decodificar resultado
+	var hash [32]byte
+	err = c.contractABI.UnpackIntoInterface(&hash, "getHashByRegConId", result)
+	if err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(hash[:]), nil
 }
 
 func (c *Client) GetActiveContracts(offset, limit uint64) ([]string, error) {

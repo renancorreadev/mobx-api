@@ -71,3 +71,38 @@ func (s *ContractService) GetStats() (map[string]interface{}, error) {
 		"activeContracts": activeCount,
 	}, nil
 }
+
+func (s *ContractService) RegisterContract(regConId, numeroContrato, dataContrato string, vehicleData models.VehicleData) (*models.ContractRegistrationResponse, error) {
+	// Registrar contrato no blockchain
+	txHash, metadataHash, err := s.blockchainClient.RegisterContract(regConId, numeroContrato, dataContrato)
+	if err != nil {
+		return nil, err
+	}
+
+	// Armazenar metadados no banco de dados
+	err = s.metadataService.StoreMetadata(metadataHash, vehicleData)
+	if err != nil {
+		return nil, err
+	}
+
+	// Criar registro no banco local
+	registry := models.ContractRegistry{
+		RegConId:     regConId,
+		MetadataHash: metadataHash,
+		BlockchainTx: txHash,
+		Status:       "active",
+	}
+
+	err = s.db.Create(&registry).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.ContractRegistrationResponse{
+		Success:      true,
+		Message:      "Contrato registrado com sucesso",
+		RegConId:     regConId,
+		MetadataHash: metadataHash,
+		TxHash:       txHash,
+	}, nil
+}
