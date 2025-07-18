@@ -1,0 +1,257 @@
+package blockchain
+
+import (
+	"context"
+	"crypto/ecdsa"
+	"encoding/hex"
+	"math/big"
+	"strings"
+
+	"vfinance-api/internal/models"
+
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+)
+
+type Client struct {
+	ethClient       *ethclient.Client
+	contractAddress common.Address
+	privateKey      *ecdsa.PrivateKey
+	contractABI     abi.ABI
+}
+
+const contractABI = `[
+	{
+		"inputs": [
+			{"internalType": "string", "name": "regConId", "type": "string"}
+		],
+		"name": "getContract",
+		"outputs": [
+			{
+				"components": [
+					{"internalType": "string", "name": "regConId", "type": "string"},
+					{"internalType": "string", "name": "numeroContrato", "type": "string"},
+					{"internalType": "string", "name": "dataContrato", "type": "string"},
+					{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"},
+					{"internalType": "uint256", "name": "timestamp", "type": "uint256"},
+					{"internalType": "address", "name": "registeredBy", "type": "address"},
+					{"internalType": "bool", "name": "active", "type": "bool"}
+				],
+				"internalType": "struct VFinanceRegistry.ContractRecord",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "string", "name": "regConId", "type": "string"},
+			{"internalType": "string", "name": "numeroContrato", "type": "string"},
+			{"internalType": "string", "name": "dataContrato", "type": "string"}
+		],
+		"name": "registerContract",
+		"outputs": [
+			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{"internalType": "uint256", "name": "offset", "type": "uint256"},
+			{"internalType": "uint256", "name": "limit", "type": "uint256"}
+		],
+		"name": "getActiveContracts",
+		"outputs": [
+			{"internalType": "string[]", "name": "", "type": "string[]"}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getTotalContracts",
+		"outputs": [
+			{"internalType": "uint256", "name": "", "type": "uint256"}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]`
+
+func NewClient(rpcURL, contractAddr, privateKeyHex string) (*Client, error) {
+	ethClient, err := ethclient.Dial(rpcURL)
+	if err != nil {
+		return nil, err
+	}
+
+	privateKey, err := crypto.HexToECDSA(strings.TrimPrefix(privateKeyHex, "0x"))
+	if err != nil {
+		return nil, err
+	}
+
+	contractAbi, err := abi.JSON(strings.NewReader(contractABI))
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{
+		ethClient:       ethClient,
+		contractAddress: common.HexToAddress(contractAddr),
+		privateKey:      privateKey,
+		contractABI:     contractAbi,
+	}, nil
+}
+
+func (c *Client) GetContract(regConId string) (*models.ContractRecord, error) {
+	// Preparar dados para chamada
+	data, err := c.contractABI.Pack("getContract", regConId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fazer chamada ao contrato
+	result, err := c.ethClient.CallContract(context.Background(), ethereum.CallMsg{
+		To:   &c.contractAddress,
+		Data: data,
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decodificar resultado
+	var contractData struct {
+		RegConId       string
+		NumeroContrato string
+		DataContrato   string
+		MetadataHash   [32]byte
+		Timestamp      *big.Int
+		RegisteredBy   common.Address
+		Active         bool
+	}
+
+	err = c.contractABI.UnpackIntoInterface(&contractData, "getContract", result)
+	if err != nil {
+		return nil, err
+	}
+
+	// Mapear para modelo
+	contractRecord := &models.ContractRecord{
+		RegConId:       contractData.RegConId,
+		NumeroContrato: contractData.NumeroContrato,
+		DataContrato:   contractData.DataContrato,
+		MetadataHash:   hex.EncodeToString(contractData.MetadataHash[:]),
+		Timestamp:      contractData.Timestamp.Uint64(),
+		RegisteredBy:   contractData.RegisteredBy.Hex(),
+		Active:         contractData.Active,
+	}
+
+	return contractRecord, nil
+}
+
+func (c *Client) RegisterContract(regConId, numeroContrato, dataContrato string) (string, error) {
+	auth, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(1337))
+	if err != nil {
+		return "", err
+	}
+
+	// Preparar dados para transação
+	data, err := c.contractABI.Pack("registerContract", regConId, numeroContrato, dataContrato)
+	if err != nil {
+		return "", err
+	}
+
+	// Estimar gas
+	gasLimit, err := c.ethClient.EstimateGas(context.Background(), ethereum.CallMsg{
+		To:   &c.contractAddress,
+		Data: data,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	auth.GasLimit = gasLimit
+
+	// Criar transação
+	tx := types.NewTransaction(
+		auth.Nonce.Uint64(),
+		c.contractAddress,
+		auth.Value,
+		gasLimit,
+		auth.GasPrice,
+		data,
+	)
+
+	// Assinar transação
+	signedTx, err := auth.Signer(auth.From, tx)
+	if err != nil {
+		return "", err
+	}
+
+	// Enviar transação
+	err = c.ethClient.SendTransaction(context.Background(), signedTx)
+	if err != nil {
+		return "", err
+	}
+
+	return signedTx.Hash().Hex(), nil
+}
+
+func (c *Client) GetActiveContracts(offset, limit uint64) ([]string, error) {
+	// Preparar dados para chamada
+	data, err := c.contractABI.Pack("getActiveContracts", big.NewInt(int64(offset)), big.NewInt(int64(limit)))
+	if err != nil {
+		return nil, err
+	}
+
+	// Fazer chamada ao contrato
+	result, err := c.ethClient.CallContract(context.Background(), ethereum.CallMsg{
+		To:   &c.contractAddress,
+		Data: data,
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decodificar resultado
+	var contracts []string
+	err = c.contractABI.UnpackIntoInterface(&contracts, "getActiveContracts", result)
+	if err != nil {
+		return nil, err
+	}
+
+	return contracts, nil
+}
+
+func (c *Client) GetTotalContracts() (uint64, error) {
+	// Preparar dados para chamada
+	data, err := c.contractABI.Pack("getTotalContracts")
+	if err != nil {
+		return 0, err
+	}
+
+	// Fazer chamada ao contrato
+	result, err := c.ethClient.CallContract(context.Background(), ethereum.CallMsg{
+		To:   &c.contractAddress,
+		Data: data,
+	}, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	// Decodificar resultado
+	var total *big.Int
+	err = c.contractABI.UnpackIntoInterface(&total, "getTotalContracts", result)
+	if err != nil {
+		return 0, err
+	}
+
+	return total.Uint64(), nil
+}
