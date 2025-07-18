@@ -26,155 +26,748 @@ type Client struct {
 }
 
 const contractABI = `[
-	{
-		"inputs": [
-			{"internalType": "string", "name": "regConId", "type": "string"}
-		],
-		"name": "getContract",
-		"outputs": [
-			{
-				"components": [
-					{"internalType": "string", "name": "regConId", "type": "string"},
-					{"internalType": "string", "name": "numeroContrato", "type": "string"},
-					{"internalType": "string", "name": "dataContrato", "type": "string"},
-					{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"},
-					{"internalType": "uint256", "name": "timestamp", "type": "uint256"},
-					{"internalType": "address", "name": "registeredBy", "type": "address"},
-					{"internalType": "bool", "name": "active", "type": "bool"}
-				],
-				"internalType": "struct VFinanceRegistry.ContractRecord",
-				"name": "",
-				"type": "tuple"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "string", "name": "regConId", "type": "string"},
-			{"internalType": "string", "name": "numeroContrato", "type": "string"},
-			{"internalType": "string", "name": "dataContrato", "type": "string"}
-		],
-		"name": "registerContract",
-		"outputs": [
-			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "uint256", "name": "offset", "type": "uint256"},
-			{"internalType": "uint256", "name": "limit", "type": "uint256"}
-		],
-		"name": "getActiveContracts",
-		"outputs": [
-			{"internalType": "string[]", "name": "", "type": "string[]"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getTotalContracts",
-		"outputs": [
-			{"internalType": "uint256", "name": "", "type": "uint256"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
-		],
-		"name": "getContractByHash",
-		"outputs": [
-			{
-				"components": [
-					{"internalType": "string", "name": "regConId", "type": "string"},
-					{"internalType": "string", "name": "numeroContrato", "type": "string"},
-					{"internalType": "string", "name": "dataContrato", "type": "string"},
-					{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"},
-					{"internalType": "uint256", "name": "timestamp", "type": "uint256"},
-					{"internalType": "address", "name": "registeredBy", "type": "address"},
-					{"internalType": "bool", "name": "active", "type": "bool"}
-				],
-				"internalType": "struct VFinanceRegistry.ContractRecord",
-				"name": "",
-				"type": "tuple"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "string", "name": "regConId", "type": "string"}
-		],
-		"name": "getHashByRegConId",
-		"outputs": [
-			{"internalType": "bytes32", "name": "", "type": "bytes32"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "string", "name": "regConId", "type": "string"}
-		],
-		"name": "doesContractExist",
-		"outputs": [
-			{"internalType": "bool", "name": "", "type": "bool"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
-		],
-		"name": "doesHashExist",
-		"outputs": [
-			{"internalType": "bool", "name": "", "type": "bool"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "uint256", "name": "index", "type": "uint256"}
-		],
-		"name": "getContractIdByIndex",
-		"outputs": [
-			{"internalType": "string", "name": "", "type": "string"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "bytes32", "name": "metadataHash", "type": "bytes32"}
-		],
-		"name": "tokenURI",
-		"outputs": [
-			{"internalType": "string", "name": "", "type": "string"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{"internalType": "string", "name": "regConId", "type": "string"}
-		],
-		"name": "getMetadataUrl",
-		"outputs": [
-			{"internalType": "string", "name": "", "type": "string"}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]`
+        {
+            "type": "constructor",
+            "inputs": [
+                {
+                    "name": "initialOwner",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "_apiServerUrl",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "_apiServerAddress",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "apiServerAddress",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "apiServerUrl",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "contractExists",
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "bool",
+                    "internalType": "bool"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "contractIds",
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "contracts",
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "numeroContrato",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "dataContrato",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "metadataHash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "registeredBy",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "active",
+                    "type": "bool",
+                    "internalType": "bool"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "doesContractExist",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "bool",
+                    "internalType": "bool"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "doesHashExist",
+            "inputs": [
+                {
+                    "name": "metadataHash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "bool",
+                    "internalType": "bool"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getActiveContracts",
+            "inputs": [
+                {
+                    "name": "offset",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "limit",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string[]",
+                    "internalType": "string[]"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getContract",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "tuple",
+                    "internalType": "struct VFinanceRegistry.ContractRecord",
+                    "components": [
+                        {
+                            "name": "regConId",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "numeroContrato",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "dataContrato",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "metadataHash",
+                            "type": "bytes32",
+                            "internalType": "bytes32"
+                        },
+                        {
+                            "name": "timestamp",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "registeredBy",
+                            "type": "address",
+                            "internalType": "address"
+                        },
+                        {
+                            "name": "active",
+                            "type": "bool",
+                            "internalType": "bool"
+                        }
+                    ]
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getContractByHash",
+            "inputs": [
+                {
+                    "name": "metadataHash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "tuple",
+                    "internalType": "struct VFinanceRegistry.ContractRecord",
+                    "components": [
+                        {
+                            "name": "regConId",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "numeroContrato",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "dataContrato",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "metadataHash",
+                            "type": "bytes32",
+                            "internalType": "bytes32"
+                        },
+                        {
+                            "name": "timestamp",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "registeredBy",
+                            "type": "address",
+                            "internalType": "address"
+                        },
+                        {
+                            "name": "active",
+                            "type": "bool",
+                            "internalType": "bool"
+                        }
+                    ]
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getContractIdByIndex",
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getHashByRegConId",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getMetadataUrl",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getTotalContracts",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "hashToRegConId",
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "owner",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "regConIdToHash",
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "registerContract",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "numeroContrato",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "dataContrato",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "metadataHash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "tokenURI",
+            "inputs": [
+                {
+                    "name": "metadataHash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "totalContracts",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "updateApiServer",
+            "inputs": [
+                {
+                    "name": "newApiServerUrl",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "newApiServerAddress",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "updateContractStatus",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "active",
+                    "type": "bool",
+                    "internalType": "bool"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "updateMetadataHash",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "newMetadataHash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "updateMetadataWithNewHash",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "newDataContrato",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "newMetadataHash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "event",
+            "name": "ApiServerUpdated",
+            "inputs": [
+                {
+                    "name": "oldUrl",
+                    "type": "string",
+                    "indexed": false,
+                    "internalType": "string"
+                },
+                {
+                    "name": "newUrl",
+                    "type": "string",
+                    "indexed": false,
+                    "internalType": "string"
+                },
+                {
+                    "name": "oldAddress",
+                    "type": "address",
+                    "indexed": false,
+                    "internalType": "address"
+                },
+                {
+                    "name": "newAddress",
+                    "type": "address",
+                    "indexed": false,
+                    "internalType": "address"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "ContractRegistered",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "indexed": true,
+                    "internalType": "string"
+                },
+                {
+                    "name": "numeroContrato",
+                    "type": "string",
+                    "indexed": true,
+                    "internalType": "string"
+                },
+                {
+                    "name": "metadataHash",
+                    "type": "bytes32",
+                    "indexed": true,
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "registeredBy",
+                    "type": "address",
+                    "indexed": false,
+                    "internalType": "address"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "ContractStatusUpdated",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "indexed": true,
+                    "internalType": "string"
+                },
+                {
+                    "name": "active",
+                    "type": "bool",
+                    "indexed": false,
+                    "internalType": "bool"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "MetadataHashUpdated",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "indexed": true,
+                    "internalType": "string"
+                },
+                {
+                    "name": "oldHash",
+                    "type": "bytes32",
+                    "indexed": false,
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "newHash",
+                    "type": "bytes32",
+                    "indexed": false,
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "error",
+            "name": "ContractAlreadyExists",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ]
+        },
+        {
+            "type": "error",
+            "name": "ContractNotFound",
+            "inputs": [
+                {
+                    "name": "regConId",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ]
+        },
+        {
+            "type": "error",
+            "name": "HashAlreadyUsed",
+            "inputs": [
+                {
+                    "name": "hash",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ]
+        },
+        {
+            "type": "error",
+            "name": "InvalidInput",
+            "inputs": [
+                {
+                    "name": "paramName",
+                    "type": "string",
+                    "internalType": "string"
+                }
+            ]
+        },
+        {
+            "type": "error",
+            "name": "UnauthorizedAccess",
+            "inputs": []
+        }
+    ]`
 
 func NewClient(rpcURL, contractAddr, privateKeyHex string) (*Client, error) {
 	ethClient, err := ethclient.Dial(rpcURL)
@@ -403,4 +996,27 @@ func (c *Client) GetTotalContracts() (uint64, error) {
 	}
 
 	return total.Uint64(), nil
+}
+
+func (c *Client) DoesContractExist(regConId string) (bool, error) {
+	data, err := c.contractABI.Pack("doesContractExist", regConId)
+	if err != nil {
+		return false, err
+	}
+
+	result, err := c.ethClient.CallContract(context.Background(), ethereum.CallMsg{
+		To:   &c.contractAddress,
+		Data: data,
+	}, nil)
+	if err != nil {
+		return false, err
+	}
+
+	var exists bool
+	err = c.contractABI.UnpackIntoInterface(&exists, "doesContractExist", result)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }

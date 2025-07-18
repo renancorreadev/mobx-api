@@ -1,0 +1,359 @@
+{
+	"info": {
+		"_postman_id": "mobx-api-collection",
+		"name": "MobX API",
+		"description": "Collection para testar a API MobX - Sistema de Metadados e Contratos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Verifica se a API está funcionando"
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Generate Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token"
+							]
+						},
+						"description": "Gera um token JWT válido para autenticação"
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"description": "Token JWT para validar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"validate"
+							]
+						},
+						"description": "Valida um token JWT"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticação JWT"
+		},
+		{
+			"name": "Metadata",
+			"item": [
+				{
+					"name": "Store Metadata",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"description": "Token JWT para autenticação"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vehicle_data\": {\n    \"brand\": \"Toyota\",\n    \"model\": \"Corolla\",\n    \"year\": 2023,\n    \"color\": \"Prata\",\n    \"engine\": \"2.0L\",\n    \"fuel_type\": \"Flex\",\n    \"mileage\": 15000,\n    \"owner\": {\n      \"name\": \"João Silva\",\n      \"document\": \"123.456.789-00\",\n      \"address\": \"Rua das Flores, 123\"\n    },\n    \"specifications\": {\n      \"transmission\": \"Automático\",\n      \"doors\": 4,\n      \"seats\": 5,\n      \"air_conditioning\": true,\n      \"power_steering\": true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/metadata/abc123hash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"metadata",
+								"abc123hash"
+							]
+						},
+						"description": "Armazena metadados de um veículo com hash específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Metadata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/metadata/abc123hash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"metadata",
+								"abc123hash"
+							]
+						},
+						"description": "Busca metadados de um veículo pelo hash"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Metadata",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"description": "Token JWT para autenticação"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vehicle_data\": {\n    \"brand\": \"Toyota\",\n    \"model\": \"Corolla\",\n    \"year\": 2023,\n    \"color\": \"Preto\",\n    \"engine\": \"2.0L\",\n    \"fuel_type\": \"Flex\",\n    \"mileage\": 18000,\n    \"owner\": {\n      \"name\": \"João Silva\",\n      \"document\": \"123.456.789-00\",\n      \"address\": \"Rua das Flores, 123\"\n    },\n    \"specifications\": {\n      \"transmission\": \"Automático\",\n      \"doors\": 4,\n      \"seats\": 5,\n      \"air_conditioning\": true,\n      \"power_steering\": true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/metadata/abc123hash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"metadata",
+								"abc123hash"
+							]
+						},
+						"description": "Atualiza metadados de um veículo existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Metadata",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"description": "Token JWT para autenticação"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/metadata/abc123hash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"metadata",
+								"abc123hash"
+							]
+						},
+						"description": "Remove metadados de um veículo"
+					},
+					"response": []
+				}
+			],
+			"description": "Operações CRUD para metadados de veículos"
+		},
+		{
+			"name": "Contracts",
+			"item": [
+				{
+					"name": "Register Contract",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"description": "Token JWT para autenticação"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"regConId\": \"6193a9b1-38a8-4d4b-a21a-8a8ca9aef9c9\",\n  \"numeroContrato\": \"250\",\n  \"dataContrato\": \"2022-03-08\",\n  \"vehicleData\": {\n    \"regConId\": \"6193a9b1-38a8-4d4b-a21a-8a8ca9aef9c9\",\n    \"numeroContrato\": \"250\",\n    \"dataContrato\": \"2022-03-08\",\n    \"cnpjAgenteFinanceiro\": \"03817784000133\",\n    \"nomeAgenteFinanceiro\": \"NATAL CAR VEICULOS LTDA\",\n    \"enderecoAgenteFinanceiro\": \"AV BERNARDO VIEIRA\",\n    \"numeroEnderecoAgenteFinanceiro\": \"3117\",\n    \"complementoEnderecoAgenteFinanceiro\": \"N/A\",\n    \"bairroEnderecoAgenteFinanceiro\": \"LAGOA SECA\",\n    \"nomeMunicipioEnderecoAgenteFinanceiro\": \"NATAL\",\n    \"ufEnderecoAgenteFinanceiro\": \"RN\",\n    \"cepEnderecoAgenteFinanceiro\": \"59022385\",\n    \"telefoneAgenteFinanceiro\": \"5584996412419\",\n    \"emailAgenteFinanceiro\": \"natal.car@gmail.com\",\n    \"cpfCnpjProprietario\": \"37235375000140\",\n    \"nomeProprietario\": \"DAC INVESTIMENTOS E PARTICIPACOES SA\",\n    \"enderecoProprietario\": \"SHIS QI 11 BLOCO M\",\n    \"numeroEnderecoProprietario\": \"3117\",\n    \"bairroEnderecoProprietario\": \"SHIS\",\n    \"nomeMunicipioProprietario\": \"NATAL\",\n    \"ufEnderecoProprietario\": \"RN\",\n    \"cepEnderecoProprietario\": \"71625620\",\n    \"telefoneProprietario\": \"5561984684398\",\n    \"emailProprietario\": \"dac.inv@gmail.com\",\n    \"veiculoZeroKm\": false,\n    \"chassiVeiculo\": \"8A1CB8205DL478385\",\n    \"chassiRemarcadoVeiculo\": \"2\",\n    \"placaVeiculo\": \"PGA4J42\",\n    \"tipoPlacaVeiculo\": \"01\",\n    \"ufPlacaVeiculo\": \"RN\",\n    \"renavamVeiculo\": \"00504329022\",\n    \"anoFabricacaoVeiculo\": \"2012\",\n    \"anoModeloVeiculo\": \"2013\",\n    \"numeroRestricaoVeiculo\": \"2055328\",\n    \"especieVeiculo\": \"AUTOMÓVEL\",\n    \"marcaVeiculo\": \"RENAULT\",\n    \"modeloVeiculo\": \"CLIO AUTHENTIQUE 1.0\",\n    \"tipoRestricacaoContrato\": \"1\",\n    \"ufRegistroContrato\": \"RN\",\n    \"cnpjResponsavelPeloRegistro\": \"42741476000123\",\n    \"valorTotalContrato\": \"23900.0\",\n    \"valorParcelaContrato\": \"11950.0\",\n    \"quantidadeParcelasContrato\": \"2\",\n    \"taxaJurosMesContrato\": \"0.01\",\n    \"taxaJurosMesAnoContrato\": \"0.01\",\n    \"possuiJurosMultaContrato\": \"N\",\n    \"taxaJurosMultaContrato\": \"0.0\",\n    \"possuiJurosMoraDiaContrato\": \"N\",\n    \"taxaJurosMoraDiaContrato\": \"0.0\",\n    \"valorCustoRegistroContrato\": \"395.0\",\n    \"valorIofContrato\": \"0.0\",\n    \"dataVencimentoPrimeiraParcelaContrato\": \"2022-03-08\",\n    \"dataVencimentoUltimaParcelaContrato\": \"2022-04-08\",\n    \"dataLiberacaoCreditoContrato\": \"2022-03-08\",\n    \"cidadeLiberacaoCreditoContrato\": \"NATAL\",\n    \"ufLiberacaoCreditoContrato\": \"RN\",\n    \"indiceCorrecaoContrato\": \"VALOR BEM\",\n    \"numeroGrupoConsorcioContrato\": \"N/A\",\n    \"numeroCotaConsorcioContrato\": \"0\",\n    \"indicativoPenalidadeContrato\": \"N\",\n    \"penalidadeContrato\": \"0\",\n    \"indicativoComissaoContrato\": \"N\",\n    \"comissaoContrato\": \"0.0\",\n    \"categoriaVeiculo\": \"ÚNICA (RN)\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/contracts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"contracts"
+							]
+						},
+						"description": "Registra um novo contrato de financiamento no blockchain"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contract by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/contracts/CONTRACT001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"contracts",
+								"CONTRACT001"
+							]
+						},
+						"description": "Busca um contrato específico pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Contracts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/contracts/active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"contracts",
+								"active"
+							]
+						},
+						"description": "Lista todos os contratos ativos"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contract by Hash",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/contracts/hash/abc123hash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"contracts",
+								"hash",
+								"abc123hash"
+							]
+						},
+						"description": "Busca um contrato pelo hash dos metadados"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contract Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/contracts/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"contracts",
+								"stats"
+							]
+						},
+						"description": "Obtém estatísticas dos contratos"
+					},
+					"response": []
+				}
+			],
+			"description": "Operações para consulta de contratos"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://147.93.11.54:3001",
+			"type": "string",
+			"description": "URL base da API MobX"
+		},
+		{
+			"key": "jwt_token",
+			"value": "your_jwt_token_here",
+			"type": "string",
+			"description": "Token JWT para autenticação (substitua pelo token real)"
+		}
+	]
+} 

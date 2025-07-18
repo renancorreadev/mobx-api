@@ -6,11 +6,11 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/cmd/main.go",
+            "program": "${workspaceFolder}/cmd",
             "env": {
                 "API_PORT": "3000",
                 "API_HOST": "0.0.0.0",
-                "DATABASE_URL": "postgres://user:password@localhost:5432/vfinance?sslmode=disable",
+                "DATABASE_URL": "postgres://user:password@147.93.11.54:5432/vfinance?sslmode=disable",
                 "REDIS_URL": "redis://localhost:6379",
                 "ETHEREUM_RPC": "http://147.93.11.54:8545",
                 "CONTRACT_ADDRESS": "0x2dd1eda184bC63cD23aE7Fe71D7c8063C673781B",
